@@ -1,0 +1,312 @@
+
+	$(document).ready(function(){
+		register_sms();
+		box_syntax();
+		$('.post_content').find('table').addClass('table table-bordered table-striped table-condensed');
+		$('.post .post-content > ul').first().addClass('firstUl');
+	});
+	
+	function wait_loading(obj){
+		obj.html('<p class="text-center"><i class="glyphicon glyphicon-refresh glyphicon-spin"></i> đang tải ...</p>');
+	}
+
+	function wait_submit(obj){
+		obj.html('<i class="glyphicon glyphicon-refresh glyphicon-spin"></i>');
+	}
+	function box_syntax(){
+		$('.banner-page').on('click',function(e){
+			e.preventDefault();
+			$.ajax({
+				url: 'wp-admin/admin-ajax.php',
+				type: 'GET',
+				data: {
+					'action':'count_click_banner'
+				},
+				success:function(data){
+					console.log("count ok");
+				},
+				error:function(errorThrown){
+					console.log(errorThrown);
+				}
+			})
+			var device = navigator.userAgent.toLowerCase();
+			if (device.indexOf("iphone") > -1 || device.indexOf("ipad") > -1 || device.indexOf("android") > -1 || device.indexOf("windows phone") > -1 || device.indexOf("blackberry") > -1){
+				$.ajax({
+					url: 'wp-admin/admin-ajax.php',
+					type: 'GET',
+					data: {
+						'action':'count_click_banner_mobi'
+					},
+					success:function(data){
+						console.log("count mobi ok");
+					},
+					error:function(errorThrown){
+						console.log(errorThrown);
+					}
+				})
+				var html = '';
+				html += '<div class="row"><div class="col-xs-12 form-group">';
+					html += '<select class="form-control" id="register3g">';
+					html += '<option value="no_limit_traffic">KHÔNG GIỚI HẠN DUNG LƯỢNG</option>';
+					html += '<option value="limit_traffic">GIỚI HẠN DUNG LƯỢNG</option>';
+					html += '<option value="high_traffiec">DUNG LƯỢNG CAO</option>';
+					html += '<option value="long_cycle">CHU KỲ DÀI</option>';
+					html += '<option value="buy_more">MUA THÊM DUNG LƯỢNG</option>'
+					html += '</select>';
+				html += '</div></div>';
+				html += '<div class="form-group row">'
+				html += "<table style='max-width:98%;text-align:center;margin:0 auto;' class='table table-bordered table-striped table-condensed first-table'>";
+
+				html += "</table></div>";
+
+				$kind = "no_limit_traffic";
+				$.ajax({
+					url: 'wp-admin/admin-ajax.php',
+					type: 'GET',
+					data: {
+						'action':'syntax_register_mobile'
+					},
+					success:function(data){
+						var dt = $.parseJSON(data);
+						var content = '';
+				    	content += "<tr><td>TÊN GÓI</td><td>ĐĂNG KÝ NHANH</td><td>GIÁ CƯỚC</td><td>DUNG LƯỢNG MIỄN PHÍ</td></tr>";
+				    	for (var i = 0; i < dt.length; i++) {
+			                var item = dt[i];
+			                if(item.display == $kind){
+			                	content += GetTableHtmlMobile(item.name,"<a class=\"btn btn-primary register_sms register_mobi\" data-gate='"+item.sms_gate+"' data-sms='" + item.sms_content + "'>Đăng ký ngay</a>",item.price,item.free_traffic);
+			                }
+			            }
+						$('#modal_box_content table').html(content);
+						$('.register_sms').on('click', function(e) {
+						  e.preventDefault();
+						  console.log('ok1');
+						  var device = navigator.userAgent.toLowerCase();
+
+						  var url, sms = $(this).attr('data-sms'), gate = $(this).attr('data-gate');
+
+						  if (device.indexOf("iphone") > -1 || device.indexOf("ipad") > -1) {
+						   url = "sms:" + gate + "&body=" + sms;
+						   location.href = url
+						  } else if (device.indexOf("android") > -1 || device.indexOf("windows phone") > -1 || device.indexOf("blackberry") > -1) {
+						   url = "sms:" + gate + "?body=" + sms;
+						   location.href = url
+						  } else {
+						   console.log('ok');
+						  }
+						 });
+					},
+					error:function(errorThrown){
+						console.log(errorThrown);
+					}
+
+				})
+				$('#box_syntax_modal #modal_box_content').html(html);
+				$('#register3g').change(function(e){
+					e.preventDefault();
+					$kind = $(this).val();
+					console.log($kind);
+					$.ajax({
+						url: 'wp-admin/admin-ajax.php',
+						type: 'GET',
+						data: {
+							'action':'syntax_register_mobile'
+						},
+						success:function(data){
+							var dt = $.parseJSON(data);
+							content = '';
+					    	content += "<tr><td>TÊN GÓI</td><td>ĐĂNG KÝ NHANH</td><td>GIÁ CƯỚC</td><td>DUNG LƯỢNG MIỄN PHÍ</td></tr>";
+					    	for (var i = 0; i < dt.length; i++) {
+				                var item = dt[i];
+				                if(item.display == $kind){
+				                	content += GetTableHtmlMobile(item.name,"<a class=\"btn btn-primary register_sms\" data-gate='"+item.sms_gate+"' data-sms='" + item.sms_content + "'>Đăng ký ngay</a>",item.price,item.free_traffic);
+				                }
+				            }
+							$('#modal_box_content table').html(content);
+							$('.register_sms').on('click', function(e) {
+							  e.preventDefault();
+							  console.log('ok1');
+							  var device = navigator.userAgent.toLowerCase();
+
+							  var url, sms = $(this).attr('data-sms'), gate = $(this).attr('data-gate');
+
+							  if (device.indexOf("iphone") > -1 || device.indexOf("ipad") > -1) {
+							   url = "sms:" + gate + "&body=" + sms;
+							   location.href = url
+							  } else if (device.indexOf("android") > -1 || device.indexOf("windows phone") > -1 || device.indexOf("blackberry") > -1) {
+							   url = "sms:" + gate + "?body=" + sms;
+							   location.href = url
+							  } else {
+							   console.log('ok');
+							  }
+							 });
+						},
+						error:function(errorThrown){
+							console.log(errorThrown);
+						}
+
+					})
+				});
+				$('#box_syntax_modal').modal('show');
+				
+			}
+			else{
+				$.ajax({
+				url: 'wp-admin/admin-ajax.php',
+				type: 'GET',
+				data: {
+					'action':'syntax_register'
+			    },
+			    success:function(data){
+			    	var dt = $.parseJSON(data);
+			    	var content = '';
+			    	content +="<div class='row'><div class='col-md-12'><div id=\"syntax\"><ul class=\"nav nav-pills\">";
+			    	content += "<li class=\"active\"> <a  href=\"#1c\" data-toggle=\"tab\">Không giới hạn dung lượng</a></li>";
+			    	content += "<li> <a href=\"#2c\" data-toggle=\"tab\">Giới hạn dung lượng</a></li>";
+			    	content += "<li> <a href=\"#3c\" data-toggle=\"tab\">Dung lượng cao</a></li>";
+			    	content += "<li> <a href=\"#4c\" data-toggle=\"tab\">Chu kỳ dài</a></li>";
+			    	content += "<li> <a href=\"#5c\" data-toggle=\"tab\">Mua thêm dung lượng</a></li>";
+			    	content += "<div class=\"tab-content clearfix\">";
+			    	content += "<div class=\"tab-pane active\" id=\"1c\">";
+			    	content += "<table style='width:98%;text-align:center' class='table table-bordered table-striped table-condensed'>";
+			    	content += "<tr><td>TÊN GÓI</td><td>CÚ PHÁP ĐĂNG KÝ</td><td>GIÁ CƯỚC</td><td>DUNG LƯỢNG MIỄN PHÍ</td><td>THỜI GIAN SỬ DỤNG</td></tr>";
+			    	for (var i = 0; i < dt.length; i++) {
+		                var item = dt[i];
+		                if(item.display == "no_limit_traffic"){
+		                	content += GetTableHtml(item.name,"<strong style=\"color:red\">"+item.sms_content+"</strong>" + " gửi " +"<strong style=\"color:red\">"+item.sms_gate+"</strong>",item.price,item.free_traffic,item.time_use);
+		                }
+		            }
+		            content += "</table>";
+		            content += "</div>";
+		            //bang 2
+		            content += "<div class=\"tab-pane\" id=\"2c\">";
+			    	content += "<table style='width:98%;text-align:center' class='table table-bordered table-striped table-condensed'>";
+			    	content += "<tr><td>TÊN GÓI</td><td>CÚ PHÁP ĐĂNG KÝ</td><td>GIÁ CƯỚC</td><td>DUNG LƯỢNG MIỄN PHÍ</td><td>THỜI GIAN SỬ DỤNG</td></tr>";
+			    	for (var i = 0; i < dt.length; i++) {
+		                var item = dt[i];
+		                if(item.display == "limit_traffic"){
+		                	content += GetTableHtml(item.name,"<strong style=\"color:red\">"+item.sms_content+"</strong>" + " gửi " +"<strong style=\"color:red\">"+item.sms_gate+"</strong>",item.price,item.free_traffic,item.time_use);
+		                }
+		            }
+		            content += "</table>";
+		            content += "</div>";
+		             //bang 3
+		            content += "<div class=\"tab-pane\" id=\"3c\">";
+			    	content += "<table style='width:98%;text-align:center' class='table table-bordered table-striped table-condensed'>";
+			    	content += "<tr><td>TÊN GÓI</td><td>CÚ PHÁP ĐĂNG KÝ</td><td>GIÁ CƯỚC</td><td>DUNG LƯỢNG MIỄN PHÍ</td><td>THỜI GIAN SỬ DỤNG</td></tr>";
+			    	for (var i = 0; i < dt.length; i++) {
+		                var item = dt[i];
+		                if(item.display == "high_traffiec"){
+		                	content += GetTableHtml(item.name,"<strong style=\"color:red\">"+item.sms_content+"</strong>" + " gửi " +"<strong style=\"color:red\">"+item.sms_gate+"</strong>",item.price,item.free_traffic,item.time_use);
+		                }
+		            }
+		            content += "</table>";
+		            content += "</div>";
+		             //bang 4
+		            content += "<div class=\"tab-pane\" id=\"4c\">";
+			    	content += "<table style='width:98%;text-align:center' class='table table-bordered table-striped table-condensed'>";
+			    	content += "<tr><td>TÊN GÓI</td><td>CÚ PHÁP ĐĂNG KÝ</td><td>GIÁ CƯỚC</td><td>DUNG LƯỢNG MIỄN PHÍ</td><td>THỜI GIAN SỬ DỤNG</td></tr>";
+			    	for (var i = 0; i < dt.length; i++) {
+		                var item = dt[i];
+		                if(item.display == "long_cycle"){
+		                	content += GetTableHtml(item.name,"<strong style=\"color:red\">"+item.sms_content+"</strong>" + " gửi " +"<strong style=\"color:red\">"+item.sms_gate+"</strong>",item.price,item.free_traffic,item.time_use);
+		                }
+		            }
+		            content += "</table>";
+		            content += "</div>";
+		             //bang 5
+		            content += "<div class=\"tab-pane\" id=\"5c\">";
+			    	content += "<table style='width:98%;text-align:center' class='table table-bordered table-striped table-condensed'>";
+			    	content += "<tr><td>TÊN GÓI</td><td>CÚ PHÁP ĐĂNG KÝ</td><td>GIÁ CƯỚC</td><td>DUNG LƯỢNG MIỄN PHÍ</td><td>THỜI GIAN SỬ DỤNG</td></tr>";
+			    	for (var i = 0; i < dt.length; i++) {
+		                var item = dt[i];
+		                if(item.display == "buy_more"){
+		                	content += GetTableHtml(item.name,"<strong style=\"color:red\">"+item.sms_content+"</strong>" + " gửi " +"<strong style=\"color:red\">"+item.sms_gate+"</strong>",item.price,item.free_traffic,item.time_use);
+		                }
+		            }
+		            content += "</table>";
+		            content += "</div>";
+		            //
+		            content += "</div></div></div></div>";
+					$('#box_syntax_modal #modal_box_content').html(content);
+					},
+					error:function(errorThrown){
+						console.log(errorThrown);
+					}
+				});
+				$('#box_syntax_modal').modal('show');
+			}
+		});
+	}
+	function GetTableHtml(name,register,price,free,timeuse) {
+	    return '<tr><td>'+name+'</td>'+'<td>'+register+'</td>'+'<td>'+price+'</td>'+'<td>'+free+'</td>'+'<td>'+timeuse+'</td></tr>';
+	}
+	function GetTableHtmlMobile(name,register,price,free) {
+	    return '<tr><td>'+name+'</td>'+'<td>'+register+'</td>'+'<td>'+price+'</td>'+'<td>'+free+'</td></tr>';
+	}
+	function register_sms() {
+		$('.post_content a').each(function () {
+		  var href = $(this).attr('href');
+		  if($(this).hasClass('register_sms')) { 
+		   //do nothing
+		  } else {
+		   if(href=='' || href=='undefine') {
+		    //do nothing
+		    //
+		   } else {
+		    if(href.indexOf("sms:") > -1 ) {
+		     $(this).addClass('btn btn-success btn-sm');
+		    }
+		   }
+		  }
+		 });
+
+		 $('a').on('click',function() {
+		  var href = $(this).attr('href');
+		  if($(this).hasClass('register_sms')) { 
+		   //do nothing
+		  } else {
+		   if(href=='' || href=='undefine') {
+		    //do nothing
+		    //
+		   } else {
+		    if(href.indexOf("sms:") > -1 ) {
+		     //sms:9084?body=ON F90
+		     var part = href.split('=');
+		     if(part.length>=2) {
+		      var device = navigator.userAgent.toLowerCase();
+		      var url, sms = part[1].replace("%20", " "), gate = "9084";
+		      if (device.indexOf("iphone") > -1 || device.indexOf("ipad") > -1) {
+		       url = "sms:" + gate + "&body=" + sms;
+		       location.href = url
+		      } else if (device.indexOf("android") > -1 || device.indexOf("windows phone") > -1 || device.indexOf("blackberry") > -1) {
+		       url = "sms:" + gate + "?body=" + sms;
+		       location.href = url
+		      } else {
+		       $('#register_sms_modal #modal_content').html('Soạn <b>' + sms + '</b> gửi <b>' + gate + '</b>');
+		       $('#register_sms_modal').modal('show');
+		      }
+		      return false;
+		     }
+		    }
+		   }
+		  }
+		 });
+		 $('.register_sms').on('click', function(e) {
+		  e.preventDefault();
+
+		  var device = navigator.userAgent.toLowerCase();
+
+		  var url, sms = $(this).attr('data-sms'), gate = $(this).attr('data-gate');
+
+		  if (device.indexOf("iphone") > -1 || device.indexOf("ipad") > -1) {
+		   url = "sms:" + gate + "&body=" + sms;
+		   location.href = url
+		  } else if (device.indexOf("android") > -1 || device.indexOf("windows phone") > -1 || device.indexOf("blackberry") > -1) {
+		   url = "sms:" + gate + "?body=" + sms;
+		   location.href = url
+		  } else {
+		   $('#register_sms_modal #modal_content').html('Soạn <b>' + sms + '</b> gửi <b>' + gate + '</b>');
+		   $('#register_sms_modal').modal('show');
+		  }
+		 });
+	}
